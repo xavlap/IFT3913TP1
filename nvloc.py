@@ -11,5 +11,6 @@ def nvloc(filePath):
             totalLine += 1
 
     print(totalLine)
+    file.close()
 
 nvloc(sys.argv[1])
