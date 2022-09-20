@@ -5,7 +5,9 @@ from pathlib import Path
 
 def file_is_a_file(filePath):
 
-    if os.path.isfile(filePath):
+    folder = Path(os.path.abspath(filePath))
+
+    if os.path.isfile(folder):
         nvloc(filePath)
     else :
         print("The path provided \"",filePath ,"\" does not lead to a file")
@@ -25,3 +27,4 @@ def nvloc(filePath):
     file.close()
 
 file_is_a_file(sys.argv[1])
+
