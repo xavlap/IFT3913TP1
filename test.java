@@ -1,9 +1,184 @@
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Purus non enim praesent elementum facilisis leo vel fringilla. Elit ullamcorper dignissim cras tincidunt lobortis feugiat vivamus. Interdum varius sit amet mattis vulputate enim nulla aliquet porttitor. Pellentesque elit eget gravida cum. Felis eget nunc lobortis mattis aliquam. Nascetur ridiculus mus mauris vitae ultricies. Eget nunc scelerisque viverra mauris in aliquam sem fringilla ut. Quam nulla porttitor massa id neque aliquam vestibulum. Diam in arcu cursus euismod quis viverra nibh. Commodo nulla facilisi nullam vehicula ipsum. Vel facilisis volutpat est velit egestas dui id ornare. Ut lectus arcu bibendum at varius vel. Sed enim ut sem viverra aliquet eget sit amet tellus.
+import javax.xml.namespace.QName;
+import javax.xml.stream.*;
+import javax.xml.stream.events.*;
+import java.util.ArrayList;
+import java.util.List;
 
-In aliquam sem fringilla ut morbi tincidunt augue. Sollicitudin tempor id eu nisl nunc mi. Vulputate sapien nec sagittis aliquam malesuada bibendum arcu vitae. Bibendum neque egestas congue quisque egestas diam in arcu cursus. Ac felis donec et odio pellentesque. Interdum consectetur libero id faucibus. Lectus magna fringilla urna porttitor rhoncus dolor purus non. Sit amet commodo nulla facilisi. Sed viverra ipsum nunc aliquet bibendum enim facilisis. Et netus et malesuada fames ac turpis egestas maecenas. Sed id semper risus in hendrerit gravida rutrum quisque. Viverra suspendisse potenti nullam ac tortor vitae. Ipsum suspendisse ultrices gravida dictum. Sollicitudin tempor id eu nisl nunc. Sed id semper risus in hendrerit gravida rutrum quisque non.
+/**
+ * Les conditions initiales de la simulation sont stockées dans des fichier XML. Le rôle de cette classe est de lire de
+ * tels fichier.
+ *
+ * On utilise une classe nomée XMLEventReader. Ce n'est pas la façon la plus facile de lire du XML, mais elle a
+ * l'avantage de faire partie du JDK, donc il n'y a pas de dépendances à ajouter à votre projet. Elle fonctionne comme
+ * un curseur dans le document: on lui demande le prochain évènement, qui peut être une ouverture de tag, des
+ * caractères, etc.
+ */
+public final class ConditionsInitiales {
+    private final XMLEventReader reader;
 
-Nisi scelerisque eu ultrices vitae auctor eu augue ut. Rutrum tellus pellentesque eu tincidunt tortor. In aliquam sem fringilla ut morbi tincidunt augue interdum. Cursus sit amet dictum sit. Vel risus commodo viverra maecenas accumsan lacus vel facilisis volutpat. Sagittis id consectetur purus ut faucibus pulvinar. Duis ut diam quam nulla porttitor massa id neque. Diam vel quam elementum pulvinar etiam non quam. Sagittis nisl rhoncus mattis rhoncus urna neque viverra justo nec. Tellus elementum sagittis vitae et leo duis. Massa tincidunt nunc pulvinar sapien et.
+    public ConditionsInitiales(XMLEventReader reader) {
+        this.reader = reader;
+    }
 
-Nibh ipsum consequat nisl vel pretium lectus quam id leo. Porttitor eget dolor morbi non arcu risus. Et tortor at risus viverra adipiscing at in. At elementum eu facilisis sed odio. Tortor pretium viverra suspendisse potenti. Donec adipiscing tristique risus nec feugiat. Lectus quam id leo in vitae turpis massa. Fames ac turpis egestas maecenas pharetra convallis posuere morbi leo. Adipiscing elit pellentesque habitant morbi tristique senectus. Id neque aliquam vestibulum morbi blandit cursus risus. Cursus mattis molestie a iaculis at erat pellentesque adipiscing commodo.
+    public Lac nextLac() throws ConditionsInitialesInvalides {
+        // On cherche le début du document.
+        while (true) {
+            var event = this.nextEvent();
+            if (event.isStartElement()) {
+                var startElement = event.asStartElement();
+                var name = startElement.getName().getLocalPart();
+                if (!name.equals("lac")) {
+                    throw new ConditionsInitialesInvalides(
+                        "je m'attendais au tag \"lac\", mais j'ai eu \"" + name + "\"");
+                }
+                break;
+            } else if (!event.isProcessingInstruction() && !event.isStartDocument()) {
+                throw new ConditionsInitialesInvalides("élément invalide: " + event);
+            }
+        }
 
-Nunc congue nisi vitae suscipit tellus mauris a. Tortor condimentum lacinia quis vel eros donec. Lacus suspendisse faucibus interdum posuere lorem ipsum dolor sit amet. Orci phasellus egestas tellus rutrum tellus pellentesque eu tincidunt tortor. Sagittis id consectetur purus ut faucibus. Gravida quis blandit turpis cursus in hac habitasse platea. Tincidunt nunc pulvinar sapien et ligula. Id diam maecenas ultricies mi eget mauris pharetra et ultrices. Lacus laoreet non curabitur gravida arcu ac tortor dignissim. Eu ultrices vitae auctor eu augue. Non pulvinar neque laoreet suspendisse interdum consectetur libero id. Molestie a iaculis at erat. Nulla porttitor massa id neque. Adipiscing elit ut aliquam purus sit amet luctus. Turpis egestas sed tempus urna. Sed pulvinar proin gravida hendrerit lectus. Massa sed elementum tempus egestas sed sed. Eu non diam phasellus vestibulum lorem sed risus ultricies.
+        Integer energieSolaire = null;
+        List<Plante> plantes = new ArrayList<>();
+        List<Herbivore> herbivores = new ArrayList<>();
+
+        while (this.reader.hasNext()) {
+            var event = this.nextEvent();
+            if (event.isStartElement()) {
+                var startElement = event.asStartElement();
+                switch (startElement.getName().getLocalPart()) {
+                    case "energieSolaire" -> {
+                        energieSolaire = this.nextInt("energieSolaire");
+                        this.skipEndTag();
+                    }
+                    case "plante" -> {
+                        var quantityAttribute = startElement.getAttributeByName(new QName("quantite"));
+                        var quantity = Integer.parseInt(quantityAttribute.getValue());
+                        var usine = new UsinePlante();
+                        this.nextPlante(usine);
+                        for (int i = 0; i < quantity; i += 1) {
+                            plantes.add(usine.creerPlante());
+                        }
+                    }
+                    case "herbivore" -> {
+                        var quantityAttribute = startElement.getAttributeByName(new QName("quantite"));
+                        var quantity = Integer.parseInt(quantityAttribute.getValue());
+                        var usine = new UsineHerbivore();
+                        this.nextHerbivore(usine);
+                        for (int i = 0; i < quantity; i += 1) {
+                            herbivores.add(usine.creerHerbivore());
+                        }
+                    }
+                }
+            } else if (event.isEndElement()) {
+                // C'est nécessairement le tag fermant </lac>, si le document est bien formé.
+                break;
+            }
+        }
+
+        if (energieSolaire == null) {
+            throw new ConditionsInitialesInvalides("energieSolaire non spécifiée");
+        }
+
+        return new Lac(energieSolaire, plantes, herbivores);
+    }
+
+    private void nextPlante(UsinePlante usine) throws ConditionsInitialesInvalides {
+        while (true) {
+            var event = this.nextEventIgnoringWhitespace();
+            if (event.isStartElement()) {
+                var startElement = event.asStartElement();
+                var name = startElement.getName().getLocalPart();
+                switch (name) {
+                    case "nomEspece" -> usine.setNomEspece(this.nextString("nomEspece"));
+                    case "besoinEnergie" -> usine.setBesoinEnergie(this.nextInt("besoinEnergie"));
+                    case "efficaciteEnergie" -> usine.setEfficaciteEnergie(this.nextDouble("efficaciteEnergie"));
+                    case "resilience" -> usine.setResilience(this.nextDouble("resilience"));
+                    case "fertilite" -> usine.setFertilite(this.nextDouble("fertilite"));
+                    case "ageFertilite" -> usine.setAgeFertilite(this.nextInt("ageFertilite"));
+                    case "energieEnfant" -> usine.setEnergieEnfant(this.nextInt("energieEnfant"));
+                    default -> throw new ConditionsInitialesInvalides(
+                        "attribut \"" + name + "\" invalide pour une plante");
+                }
+                this.skipEndTag();
+            } else if (event.isEndElement()) {
+                return;
+            }
+        }
+    }
+
+    private void nextHerbivore(UsineHerbivore usine) throws ConditionsInitialesInvalides {
+        while (true) {
+            var event = this.nextEventIgnoringWhitespace();
+            if (event.isStartElement()) {
+                var startElement = event.asStartElement();
+                var name = startElement.getName().getLocalPart();
+                switch (name) {
+                    case "nomEspece" -> usine.setNomEspece(this.nextString("nomEspece"));
+                    case "besoinEnergie" -> usine.setBesoinEnergie(this.nextInt("besoinEnergie"));
+                    case "efficaciteEnergie" -> usine.setEfficaciteEnergie(this.nextDouble("efficaciteEnergie"));
+                    case "resilience" -> usine.setResilience(this.nextDouble("resilience"));
+                    case "fertilite" -> usine.setFertilite(this.nextDouble("fertilite"));
+                    case "ageFertilite" -> usine.setAgeFertilite(this.nextInt("ageFertilite"));
+                    case "energieEnfant" -> usine.setEnergieEnfant(this.nextInt("energieEnfant"));
+                    case "debrouillardise" -> usine.setDebrouillardise(this.nextDouble("debrouillardise"));
+                    case "voraciteMin" -> usine.setVoraciteMin(this.nextDouble("voraciteMin"));
+                    case "voraciteMax" -> usine.setVoraciteMax(this.nextDouble("voraciteMax"));
+                    case "aliments" -> usine.addAliment(this.nextString("aliments"));
+                    default -> throw new ConditionsInitialesInvalides(
+                        "attribut \"" + name + "\" invalide pour un herbivore");
+                }
+                this.skipEndTag();
+            } else if (event.isEndElement()) {
+                return;
+            }
+        }
+    }
+
+    private String nextString(String context) throws ConditionsInitialesInvalides {
+        var characters = this.nextCharacters(context);
+        return characters.getData().trim();
+    }
+
+    private int nextInt(String context) throws ConditionsInitialesInvalides {
+        return Integer.parseInt(this.nextString(context));
+    }
+
+    private double nextDouble(String context) throws ConditionsInitialesInvalides {
+        return Double.parseDouble(this.nextString(context));
+    }
+
+    private Characters nextCharacters(String context) throws ConditionsInitialesInvalides {
+        var event = this.nextEvent();
+        if (event.isCharacters()) {
+            return event.asCharacters();
+        } else {
+            throw new ConditionsInitialesInvalides("je m'attendais à avoir des caractères dans " + context);
+        }
+    }
+
+    private void skipEndTag() throws ConditionsInitialesInvalides {
+        var event = this.nextEventIgnoringWhitespace();
+        if (!event.isEndElement()) {
+            throw new ConditionsInitialesInvalides(
+                "je m'attendais à la fin d'un tag, mais j'ai eu des données: " + event);
+        }
+    }
+
+    private XMLEvent nextEventIgnoringWhitespace() throws ConditionsInitialesInvalides {
+        while (true) {
+            var event = this.nextEvent();
+            if (event.isCharacters() && event.asCharacters().isWhiteSpace()) {
+                continue;
+            }
+            return event;
+        }
+    }
+
+    private XMLEvent nextEvent() throws ConditionsInitialesInvalides {
+        try {
+            return this.reader.nextEvent();
+        } catch (XMLStreamException e) {
+            throw new ConditionsInitialesInvalides("le document se termine avant la fin", e);
+        }
+    }
+}
