@@ -3,28 +3,26 @@ import sys
 from pathlib import Path
 
 
-def file_is_a_file(filePath):
-
-    folder = Path(os.path.abspath(filePath))
+def file_is_a_file(file_path):
+    folder = Path(os.path.abspath(file_path))
 
     if os.path.isfile(folder):
-        nvloc(filePath)
-    else :
-        print("The path provided \"",filePath ,"\" does not lead to a file")
+        nvloc(file_path)
+    else:
+        print("The path provided \"", file_path, "\" does not lead to a file")
 
 
-def nvloc(filePath):
+def nvloc(file_path):
+    file = open(file_path, 'r')
+    lines = file.readlines()
+    total_line = 0
 
-    file = open(filePath, 'r')
-    Lines = file.readlines()
-    totalLine = 0
-
-    for line in Lines:
+    for line in lines:
         if not line in ['\n', '\r\n']:
-            totalLine += 1
+            total_line += 1
 
-    print(totalLine)
+    print(total_line)
     file.close()
 
-file_is_a_file(sys.argv[1])
 
+file_is_a_file(sys.argv[1])

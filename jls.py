@@ -1,14 +1,21 @@
-import csv
+import sys
 import os
-
-f = open(os.getcwd() + "/myCSV.csv","w")
-writer = csv.writer(f)
+import csv
 
 
-input = input("please enter a directory : ")
+def jls(file_path):
+    f = open(os.getcwd() + "/myCSV.csv", "w")
+    writer = csv.writer(f)
+    print(os.getcwd())
 
-for root, dirs, files in os.walk(input): 
-    for name in files:
-        writer.writerow([os.path.join(root, name),root.replace("/","."), name])
+    for root, dirs, files in os.walk(file_path):
+        for name in files:
+            class_name = name.replace(".java", "")
+            file_location = root.replace(sys.argv[1], ".")
+            package_location = root.replace(sys.argv[1]+"/", "").replace("/", ".")
+            print(package_location)
+            writer.writerow([os.path.join(file_location, name), package_location, class_name])
+    f.close()
 
-f.close()
+
+jls(sys.argv[1])
