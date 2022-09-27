@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 def jls(file_path):
-    f = open(os.getcwd() + "/myCSV.csv", "w")
+    f = open(os.getcwd() + "/jls.csv", "w")
     writer = csv.writer(f)
 
     for root, dirs, files in os.walk(file_path):
@@ -16,8 +16,8 @@ def jls(file_path):
             writer.writerow([folder_location, package_name, file_name])
     f.close()
 
-    return os.getcwd() + "/myCSV.csv"
+    return os.getcwd() + "/jls.csv"
 
 
-if len(sys.argv) >1  :
+if len(sys.argv) > 1:
     jls(sys.argv[1])
