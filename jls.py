@@ -1,6 +1,7 @@
 import sys
 import os
 import csv
+from pathlib import Path
 
 
 def jls(file_path):
@@ -9,11 +10,14 @@ def jls(file_path):
 
     for root, dirs, files in os.walk(file_path):
         for name in files:
-            class_name = name.replace(".java", "")
-            file_location = root.replace(sys.argv[1], ".")
-            package_location = root.replace(sys.argv[1] + "/", "").replace("/", ".")
-            writer.writerow([os.path.join(file_location, name), package_location, class_name])
+            folder_location = str(os.path.join(root, name)).replace(sys.argv[1],"./")
+            package_name = str(root).replace(sys.argv[1],"").replace("/", ".")
+            file_name = str(name).replace(".java", "")
+            writer.writerow([folder_location, package_name, file_name])
     f.close()
 
+    return os.getcwd() + "/myCSV.csv"
 
-jls(sys.argv[1])
+
+if len(sys.argv) >1  :
+    jls(sys.argv[1])

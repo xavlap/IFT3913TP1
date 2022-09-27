@@ -2,17 +2,12 @@ import csv
 import ntpath
 import os
 import sys
-from operator import contains
 
 
-# os.system("jls.py {}".format(sys.argv[1]))
+# devrait être le même path qui a été donné pour jls.py
 
-# os.system("python3 jls.py {}".format(sys.argv[1]))
-
-# open CSV FILE made in part and extract all the method name
-
-def lcsec():
-    f = open(sys.argv[1], "r")
+def lcsec(path_to_folder, csv_file):
+    f = open(csv_file, "r")
     g = open(os.getcwd() + "/lcsec.csv", "w")
     writer = csv.writer(g)
 
@@ -23,11 +18,11 @@ def lcsec():
 
     for row in csv.reader(f):
         methods.append(row[2])
-        paths.append(row[0])
+        paths.append(os.path.join(path_to_folder, str(row[0]).replace("./", "")))
 
-    for method in methods:
-        class_name = method + ".java"
-        package = "/home/louis/Documents/Ecole/Session6/IFT3913/ckjm/src/"
+    for path in paths:
+
+        method = os.path.basename(path).replace(".java", "")
 
         # Faire une liste qui comprend toutes les utilisations à trouver sauf elle-même
         # (IE on ne cherche pas MethodVisitor dans MethodVisitor)
@@ -36,26 +31,23 @@ def lcsec():
             if method != j:
                 list_to_look.append(j)
 
-        uses = compter_les_occurances_de_methode_dans_une_classe(os.path.join(package, class_name),
-                                                                 list_to_look)  # MethodVisitor utilise toute ces methods
+        uses = compter_les_occurences_de_methode_dans_une_classe(path, list_to_look)
 
         # Faire une liste des files ou la methode rechercher pourrait
-        # se trouver en excluant le fichier ou elle est déclarer
+        # se trouver en excluant le fichier ou elle est déclaré
         paths_to_look = []
-        for path in paths:
-            if method != ntpath.basename(path).replace(".java", ""):
-                paths_to_look.append(path)
+        for i in paths:
+            if method != ntpath.basename(i).replace(".java", ""):
+                paths_to_look.append(i)
 
-        is_used = trouver_usage_autres_classes(str(method),
-                                               "/home/louis/Documents/Ecole/Session6/IFT3913/ckjm/src/")  # MethodVisitor est utilise par toute ces methodes
+        is_used = trouver_usage_autres_classes(str(method), paths_to_look)
 
         total.append(is_used + uses)
 
-    f.seek(0,0)
+    f.seek(0, 0)
     for row in csv.reader(f):
-        print(row)
-        writer.writerow([row[0],row[1],row[2],total[writing_index]])
-        writing_index+=1
+        writer.writerow([row[0], row[1], row[2], total[writing_index]])
+        writing_index += 1
 
     f.close()
     g.close()
@@ -63,17 +55,7 @@ def lcsec():
     return
 
 
-def trouver_usage_autres_classes(method_to_find, package_path):
-    files = ["/home/louis/Documents/Ecole/Session6/IFT3913/ckjm/src/gr/spinellis/ckjm/MethodVisitor.java",
-             "/home/louis/Documents/Ecole/Session6/IFT3913/ckjm/src/gr/spinellis/ckjm/CkjmOutputHandler.java",
-             "/home/louis/Documents/Ecole/Session6/IFT3913/ckjm/src/gr/spinellis/ckjm/ClassMetrics.java",
-             "/home/louis/Documents/Ecole/Session6/IFT3913/ckjm/src/gr/spinellis/ckjm/ClassMetricsContainer.java",
-             "/home/louis/Documents/Ecole/Session6/IFT3913/ckjm/src/gr/spinellis/ckjm/ClassVisitor.java",
-             "/home/louis/Documents/Ecole/Session6/IFT3913/ckjm/src/gr/spinellis/ckjm/MetricsFilter.java",
-             "/home/louis/Documents/Ecole/Session6/IFT3913/ckjm/src/gr/spinellis/ckjm/PrintPlainResults.java",
-             "/home/louis/Documents/Ecole/Session6/IFT3913/ckjm/src/gr/spinellis/ckjm/ant/CkjmTask.java",
-             "/home/louis/Documents/Ecole/Session6/IFT3913/ckjm/src/gr/spinellis/ckjm/ant/PrintXmlResults.java"
-             ]
+def trouver_usage_autres_classes(method_to_find, files):
 
     usages = 0
 
@@ -85,21 +67,20 @@ def trouver_usage_autres_classes(method_to_find, package_path):
             usages += 1
         f.close()
 
-    # On soustrait 1 pour éviter de compter la classe dans laquelle elle est declarer
-    return usages - 1
-
-
-def compter_les_occurances_de_methode_dans_une_classe(file, method_list):
-    f = open("/home/louis/Documents/Ecole/Session6/IFT3913/ckjm/src/gr/spinellis/ckjm/MethodVisitor.java", "r")
-    usages = 0
-    file = f.read()
-
-    for i in method_list:
-        if file.count(str(i)) > 0:
-            usages += 1
     return usages
 
 
-# /home/louis/Documents/Ecole/Session6/IFT3913/ckjm/src/gr/spinellis/ckjm/ClassVisitor.java
+def compter_les_occurences_de_methode_dans_une_classe(file, method_list):
+    f = open(file, "r")
+    usages = 0
+    reader = f.read()
 
-lcsec()
+    for i in method_list:
+        if reader.count(str(i)) > 0:
+            usages += 1
+
+    return usages
+
+
+if len(sys.argv) > 1:
+    lcsec(sys.argv[1], sys.argv[2])

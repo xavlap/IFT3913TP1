@@ -24,5 +24,7 @@ def nvloc(file_path):
     print(total_line)
     file.close()
 
+    return total_line
+
 
 file_is_a_file(sys.argv[1])
