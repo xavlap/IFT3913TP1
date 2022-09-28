@@ -21,7 +21,7 @@ def egon(path_to_dir, threshold: int):
 
 
     for row in csv.reader(l):
-        path = os.path.join(path_to_dir, str(row[0]).replace("./", ""))
+        path = os.path.join(path_to_dir, str(row[0])).replace("./", "")
         process = subprocess.run(['python3', 'nvloc.py', str(path)], stdout=subprocess.PIPE, universal_newlines=True)
         nvloc = int(process.stdout)
 
