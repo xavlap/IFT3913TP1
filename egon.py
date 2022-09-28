@@ -3,6 +3,9 @@ import os
 import subprocess
 import sys
 
+# Mettre le même path que pour les méthodes jls et lcsec
+# Exemple de commande pour créer le csv résultant
+# python3 egon.py ./ckjm/src/ 30
 
 def egon(path_to_dir, threshold: int):
     l = open("./lcsec.csv", "r")
@@ -45,7 +48,7 @@ def egon(path_to_dir, threshold: int):
 
         print(result[2] + " nvloc % = " + str(percentile_nvloc) + " and lcsec % = " + str(percentile_lcsec))
 
-        if percentile_nvloc < int(threshold) and (percentile_lcsec < int(threshold)):
+        if 100 - percentile_nvloc < int(threshold) and 100 - percentile_lcsec < int(threshold):
             print(result[0] + "," + result[1] + "," + result[2] + "," + result[3] + "," + result[4])
 
     l.close()

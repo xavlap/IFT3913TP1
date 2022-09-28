@@ -2,7 +2,8 @@ import os.path
 import sys
 from pathlib import Path
 
-
+# exemple de commande pour lancer de programme
+# python3 nvloc.py ./ckjm/src/gr/spinellis/ckjm/MethodVisitor.java
 def file_is_a_file(file_path):
     folder = Path(os.path.abspath(file_path))
 

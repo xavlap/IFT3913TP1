@@ -1,9 +1,9 @@
 import sys
 import os
 import csv
-from pathlib import Path
 
-
+# exemple de commande pour lancer de programme
+# python3 jls.py ./ckjm/src/
 def jls(file_path):
     f = open(os.getcwd() + "/jls.csv", "w")
     writer = csv.writer(f)
@@ -19,5 +19,5 @@ def jls(file_path):
     return os.getcwd() + "/jls.csv"
 
 
-if len(sys.argv) > 1:
+if len(sys.argv) > 0:
     jls(sys.argv[1])

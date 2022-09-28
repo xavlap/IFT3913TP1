@@ -3,8 +3,9 @@ import ntpath
 import os
 import sys
 
-
-# devrait être le même path qui a été donné pour jls.py
+# Prend en arguments le même path que celui donné pour jls.py et le csv créer par jls
+# exemple de commande pour lancer de programme
+# python3 lcsec.py ./ckjm/src/ jls.csv
 
 def lcsec(path_to_folder, csv_file):
     f = open(csv_file, "r")
