@@ -10,6 +10,8 @@ python 3 lcsec.py path jls.csv
 
 python 3 egon.py path seuil
 
-jls.py écrit ses résultats dans jls.csv.\n
-lcsec.py écrit ses résultat dans lcsec.csv et utilise directement nvloc.py.\n
-egon.py écrit ses résultat dans egon.csv.\n
+jls.py écrit ses résultats dans jls.csv.
+
+lcsec.py écrit ses résultat dans lcsec.csv et utilise directement nvloc.py.
+
+egon.py écrit ses résultat dans egon.csv.
