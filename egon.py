@@ -1,4 +1,5 @@
 import csv
+import math
 import os
 import subprocess
 import sys
@@ -18,6 +19,7 @@ def egon(path_to_dir, threshold: int):
     nvloc_results = []
     lcsec_results = []
 
+
     for row in csv.reader(l):
         path = os.path.join(path_to_dir, str(row[0]).replace("./", ""))
         process = subprocess.run(['python3', 'nvloc.py', str(path)], stdout=subprocess.PIPE, universal_newlines=True)
@@ -33,22 +35,21 @@ def egon(path_to_dir, threshold: int):
     nvloc_results.sort(reverse=True)
     lcsec_results.sort(reverse=True)
 
+    results_in_percentile = (int(threshold) / 100) * (len(nvloc_results))
+
+    if results_in_percentile < 1:
+        results_in_percentile = math.ceil(results_in_percentile)
+    else:
+        results_in_percentile = round(results_in_percentile)
+
+    threshold_lcsec = []
+    threshold_nvloc = []
+    for i in range(0, results_in_percentile):
+        threshold_lcsec.append(lcsec_results[i])
+        threshold_nvloc.append(nvloc_results[i])
+
     for result in results:
-
-        percentile_nvloc = 0
-        percentile_lcsec = 0
-
-        for i in range(len(nvloc_results)):
-            if int(result[4]) == nvloc_results[i]:
-                percentile_nvloc = int(round(((len(nvloc_results) - i) / len(nvloc_results)) * 100))
-
-        for i in range(len(lcsec_results)):
-            if int(result[3]) == lcsec_results[i]:
-                percentile_lcsec = int(round(((len(lcsec_results) - i) / len(lcsec_results)) * 100))
-
-        print(result[2] + " nvloc % = " + str(percentile_nvloc) + " and lcsec % = " + str(percentile_lcsec))
-
-        if 100 - percentile_nvloc < int(threshold) and 100 - percentile_lcsec < int(threshold):
+        if (int(result[3]) in threshold_lcsec) and (int(result[4]) in threshold_nvloc):
             print(result[0] + "," + result[1] + "," + result[2] + "," + result[3] + "," + result[4])
 
     l.close()
