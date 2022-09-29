@@ -15,6 +15,6 @@ brief resumer du fonctionnement
 
 * jls.py écrit ses résultats dans jls.csv.
 
-* lcsec.py lit dans jls.csv, écrit ses résultats dans lcsec.csv et utilise directement nvloc.py.
+* lcsec.py lit dans jls.csv, écrit ses résultats dans lcsec.csv. 
 
-* egon.py lit dans lcsec.csv et écrit ses résultats dans egon.csv.
+* egon.py lit dans lcsec.csv et écrit ses résultats dans egon.csv. Lit nvloc.py de manière automatique.
