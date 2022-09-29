@@ -10,7 +10,7 @@ def jls(file_path):
 
     for root, dirs, files in os.walk(file_path):
         for name in files:
-            folder_location = str(os.path.join(root, name)).replace(sys.argv[1],"./")
+            folder_location = str(os.path.join(root, name)).replace(sys.argv[1],".")
             package_name = str(root).replace(sys.argv[1],"").replace("/", ".")
             file_name = str(name).replace(".java", "")
             writer.writerow([folder_location, package_name, file_name])

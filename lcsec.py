@@ -17,18 +17,12 @@ def lcsec(path_to_folder, csv_file):
     total = []
     writing_index = 0
 
-    print(path_to_folder)
-
     for row in csv.reader(f):
         methods.append(row[2])
-        paths.append(os.path.join(path_to_folder, str(row[0])).replace(".//", "/"))
+        paths.append(os.path.join(path_to_folder, str(row[0])))
         
 
-    print(paths[3])
-    print("---------------------------------------")
-
     for path in paths:
-
         method = os.path.basename(path).replace(".java", "")
 
         # Faire une liste qui comprend toutes les utilisations à trouver sauf elle-même

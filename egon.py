@@ -11,7 +11,7 @@ import sys
 def egon(path_to_dir, threshold: int):
     l = open("./lcsec.csv", "r")
 
-    e = open("./egon1.csv", "w")
+    e = open("./egon.csv", "w")
     writer = csv.writer(e)
 
     # initialiser des lists pour faciliter le calcul des seuils
@@ -49,7 +49,6 @@ def egon(path_to_dir, threshold: int):
 
     for result in results:
         if (int(result[3]) in threshold_lcsec) and (int(result[4]) in threshold_nvloc):
-            print(result[0] + "," + result[1] + "," + result[2] + "," + result[3] + "," + result[4])
             writer.writerow(result)
 
     l.close()
